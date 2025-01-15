@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>登录</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -15,9 +15,9 @@
             <div class="form-wrapper">
                 <div class="login-form">
                     <div class="tips">
-                        <h1>Login in this platform.</h1>
-                        <span>No account?</span>
-                        <span class="signup-into">Create</span>
+                        <h1>登录.</h1>
+                        <span>没有账号?</span>
+                        <span class="signup-into">现在注册一个</span>
                     </div>
                     <div class="form-wrapper">
                         <div class="input-wrapper user">
@@ -31,13 +31,13 @@
                             <span class="veri-code-tips">Click To Get</span>
                         </div>
                         <div class="btn-wrapper">
-                            <button class="form-btn other-login-btn">VeriCode Login</button>
+                            <button class="form-btn other-login-btn">用验证码登录</button>
                             <button class="form-btn login-btn">Login</button>
                         </div>
                         <div class="other-login">
                             <div class="divider">
                                 <span class="line"></span>
-                                <span class="divider-text">or</span>
+                                <span class="divider-text">你可以用这些来快捷登录</span>
                                 <span class="line"></span>
                             </div>
                             <div class="other-login-wrapper">
@@ -53,9 +53,9 @@
                 </div>
                 <div class="signup-form">
                     <div class="tips">
-                        <h1>Create new account.</h1>
-                        <span>Already A Member?</span>
-                        <span class="login-into">Log in</span>
+                        <h1>现在来注册一下吧.</h1>
+                        <span>账号或密码想起来了？</span>
+                        <span class="login-into">登录</span>
                     </div>
                     <div class="form-wrapper">
                         <div class="input-wrapper user">
@@ -89,7 +89,7 @@
         reckonTimeFlag--;
         if (reckonTimeFlag < 0) {
             clearInterval(reckonTime);
-            reckonTimeFlag = 5;
+            reckonTimeFlag = 60;
             veriCodeTips.innerHTML = `Click To Get`;
             veriCodeTips.style.color = "rgb(39, 150, 247)";
             veriCodeTips.onclick = veriCodeTipsClick;
