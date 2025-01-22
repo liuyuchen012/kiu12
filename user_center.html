@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户中心</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        .user-info {
+            margin-bottom: 20px;
+        }
+        .user-info p {
+            font-size: 18px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>用户中心</h2>
+    <div class="user-info">
+        <p>用户名: <span id="username">加载中...</span></p>
+
+    </div>
+    <a href="javascript:void(0);" class="button" onclick="editUsername()">修改用户名</a>
+    <a href="javascript:void(0);" class="button" onclick="editPassword()">修改密码</a>
+    <a href="javascript:void(0);" class="button" onclick="editEmail()">修改邮箱</a>
+    <a href="javascript:void(0);" class="button" onclick="logout()">退出登录</a>
+    <a href="index.html" class="button" >返回</a>
+</div>
+
+<script>
+    // 获取指定名称的 Cookie 值
+    function getCookie(name) {
+        let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        if (match) return match[2];
+        return null;
+    }
+
+    // 页面加载时获取用户信息
+    window.onload = function() {
+        var username = getCookie('615username');
+
+
+        if (username) {
+            document.getElementById('username').textContent = username;
+
+        } else {
+            alert('未找到用户信息，请登录后访问');
+            window.location.href = 'login.php';  // 如果没有登录，则跳转回登录页面
+        }
+    }
+
+    // 修改用户名
+    function editUsername() {
+        var newUsername = prompt('请输入新的用户名:', document.getElementById('username').textContent);
+        if (newUsername) {
+            // 使用 AJAX 提交新的用户名到后台
+            updateUserInfo('username', newUsername);
+        }
+    }
+
+    // 修改密码
+    function editPassword() {
+        var newPassword = prompt('请输入新的密码:', '');
+        if (newPassword) {
+            // 使用 AJAX 提交新的密码到后台
+            updateUserInfo('password', newPassword);
+        }
+    }
+
+    // 修改邮箱
+    function editEmail() {
+        var newEmail = prompt('请输入新的邮箱:', document.getElementById('email').textContent);
+        if (newEmail) {
+            // 使用 AJAX 提交新的邮箱到后台
+            updateUserInfo('email', newEmail);
+        }
+    }
+
+    // 提交修改的字段到后台 PHP 文件
+    function updateUserInfo(field, value) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'update_user_info.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                alert(xhr.responseText); // 显示服务器返回的信息
+                if (field === 'username') {
+                    document.getElementById('username').textContent = value; // 更新页面上的用户名
+                } else if (field === 'email') {
+                    document.getElementById('email').textContent = value; // 更新页面上的邮箱
+                }
+            } else {
+                alert('修改失败');
+            }
+        };
+        xhr.send('field=' + field + '&value=' + encodeURIComponent(value));
+    }
+
+    // 退出登录
+    function logout() {
+        document.cookie = '615username=; expires=Thu, 01 Jan 1970 00:00:00 GMT';  // 清除用户名 Cookie
+        document.cookie = '615email=; expires=Thu, 01 Jan 1970 00:00:00 GMT';  // 清除邮箱 Cookie
+        window.location.href = "index.php";  // 重定向到登录页面
+    }
+</script>
+
+</body>
+</html>
