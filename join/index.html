@@ -63,13 +63,22 @@
                         <span class="login-into">登录</span>
                     </div>
                     <div class="form-wrapper">
-                        <div class="input-wrapper user">
-                            <input type="text" class="inputs">
-                        </div>
-                        <div class="input-wrapper pwd">
-                            <input type="password" class="inputs">
-                        </div>
-                        <button class="form-btn">完成注册</button>
+                        <form action="http://152.136.105.29:81/register.php" method="POST">
+
+                            <div class="input-wrapper user">
+                                <input type="text" name="username" placeholder="用户名" required>
+                            </div>
+                            <div class="input-wrapper user">
+                                <input type="email" name="email" placeholder="电子邮件" required>
+                            </div>
+                            <div class="input-wrapper pwd">
+                                <input type="password" name="password" placeholder="密码" required>
+                            </div>
+                            <div class="input-wrapper pwd">
+                                <input type="password" name="confirm_password" placeholder="确认密码" required>
+                            </div>
+                            <button type="submit" class="form-btn">完成注册</button>
+                        </form>
                     </div>
                 </div>
             </div>
