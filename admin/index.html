@@ -1,127 +1,36 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用户地理位置数据收集</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        #result {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #e6f3ff;
-            border: 1px solid #99ccff;
-            border-radius: 5px;
-            display: none;
-        }
-        #error {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #ffe6e6;
-            border: 1px solid #ffccff;
-            border-radius: 5px;
-            display: none;
-        }
-    </style>
-</head>
+<html>
 <body>
-    <div class="container">
-        <h1>用户地理位置数据收集系统</h1>
-        
-        <script>
-            // 定义全局对象
-            let dbConfig = {
-                host: 'mc.615mc.top',  // 数据库IP地址
-                port: 3306,       // 数据库端口
-                database: 'where',  // 数据库名称
-                username: 'root',   // 数据库用户名
-                password: 'Nj96khu3' // 数据库密码
-            };
+<script>
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(sendToServer, showError);
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
 
-            // 用户地理位置数据收集开始
-            let geolocationSuccess = function(position) {
-                console.log('地理位置获取成功：');
-                console.log('经度：' + position.coords.latitude);
-                console.log('纬度：' + position.coords.longitude);
+function sendToServer(position) {
+  const data = {
+    latitude: position.coords.latitude,
+    longitude: position.coords.longitude,
+    accuracy: position.coords.accuracy
+  };
 
-                // 发送数据到数据库
-                sendToDatabase({
-                    userId: '12345',      // 假设用户ID为12345，实际根据需求修改
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    timestamp: new Date().toISOString()
-                });
-            };
+  // 发送到后端API，而非直接连接数据库
+  fetch('https://152.136.105.29:82/save-location', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+}
 
-            let geolocationError = function(err) {
-                console.error('地理位置获取失败：' + err.message);
-                showErrorMsg('无法获取您的位置，可能是浏览器设置或网络问题。');
-            };
+function showError(error) {
+  alert(`Error: ${error.message}`);
+}
 
-            // 检查浏览器支持
-            if(navigator.geolocation === undefined || !navigator.geolocation.isSupported()) {
-                showErrorMsg('您的浏览器不支持地理位置服务，请使用支持Geolocation的浏览器（如Chrome、Firefox等）。');
-                return;
-            }
-
-            // 获取用户地理位置
-            navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationError);
-
-            // 发送数据到数据库的函数
-            function sendToDatabase(data) {
-                console.log('发送数据到数据库：' + JSON.stringify(data));
-
-                // 使用fetch进行AJAX请求
-                fetch('/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => response.text())
-                .then(responseText => {
-                    console.log('数据库响应：' + responseText);
-                    
-                    if(responseText === '成功') {
-                        showSuccessMsg('数据已成功发送到数据库。');
-                    } else {
-                        showErrorMsg('数据发送失败，请检查网络连接或权限问题。');
-                    }
-                })
-                .catch(error => {
-                    console.error('请求错误：' + error.message);
-                    showErrorMsg('请求数据库失败，可能是网络问题或服务器错误。');
-                });
-            }
-
-            // 显示成功信息
-            function showSuccessMsg(msg) {
-                document.getElementById('result').style.display = 'block';
-                document.getElementById('result').innerHTML = '<h3>⚠️  成功:</h3>' + msg;
-            }
-
-            // 显示错误信息
-            function showErrorMsg(msg) {
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').innerHTML = '<h3>❌ 错误:</h3>' + msg;
-            }
-        </script>
-    </div>
+// 页面加载后请求权限
+window.onload = getLocation;
+</script>
 </body>
 </html>
