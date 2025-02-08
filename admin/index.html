@@ -18,7 +18,7 @@ function sendToServer(position) {
   };
 
   // 发送到后端API，而非直接连接数据库
-  fetch('https://152.136.105.29/save-location', {
+  fetch('https://152.136.105.29', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
