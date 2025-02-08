@@ -2,144 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Save Location</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .success {
-            color: green;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .error {
-            color: red;
-            text-align: center;
-            margin-top: 10px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动定位提交</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Save Location Data</h1>
-        <form id="locationForm">
-            <div class="form-group">
-                <label for="latitude">Latitude:</label>
-                <input type="text" id="latitude" name="latitude" placeholder="Enter Latitude">
-            </div>
-            <div class="form-group">
-                <label for="longitude">Longitude:</label>
-                <input type="text" id="longitude" name="longitude" placeholder="Enter Longitude">
-            </div>
-            <div class="form-group">
-                <label for="accuracy">Accuracy (m):</label>
-                <input type="number" id="accuracy" name="accuracy" min="0" max="200" placeholder="Enter Accuracy">
-            </div>
-            <button type="submit">Save Data</button>
-        </form>
+    <h1>地理位置自动定位</h1>
+    <p>页面将自动获取你的位置信息并提交。</p>
+    
+    <!-- 如果位置请求失败，显示错误提示 -->
+    <div id="error" style="display: none;">
+        位置请求失败！请检查网络连接。
     </div>
 
     <script>
-        document.getElementById('locationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // 使用 AJAX 发送 GET 请求
-            const formData = new FormData(this);
-            const url = 'https://152.136.105.29/index.php';
-            
-            fetch(url, {
-                method: 'GET',
-                body: formData,
-            })
-            .then(function(response) {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('请求失败');
-                }
-            })
-            .then(function(data) {
-                const successDiv = document.querySelector('.success');
-                const errorDiv = document.querySelector('.error');
-                
-                if (data.message === 'Location saved') {
-                    successDiv.textContent = data.message;
-                } else {
-                    errorDiv.textContent = data.error || '未知错误';
-                }
-            })
-            .catch(function(error) {
-                console.error('请求失败:', error);
-                errorDiv.textContent = '请检查网络连接或输入是否正确';
-            });
-        });
+        // 检测地理定位支持
+        if ('geolocation' in navigator) {
+            console.log('浏览器支持地理定位');
+            navigator.geolocation.requestLocation(
+                function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
 
-        // 也可以通过 GET 方法传递数据，示例代码：
-        const lat = document.getElementById('latitude').value;
-        const lng = document.getElementById('longitude').value;
-        const acc = document.getElementById('accuracy').value;
-
-        function saveLocation() {
-            if (!lat || !lng || !acc) {
-                alert('请填写所有字段');
-                return false;
-            }
-            
-            // 使用 GET 方法传递数据
-            const url = 'https://152.136.105.29/index.php?latitude=' + lat + '&longitude=' + lng + '&accuracy=' + acc;
-            window.location.href = url;
+                    // 提交数据到后端处理脚本
+                    fetch('https://152.136.105.29/geolocation.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Cache-Control': 'no-cache'
+                        },
+                        body: encodeURIComponent(latitude) + '&lng=' + encodeURIComponent(longitude)
+                    })
+                    .then(function(response) {
+                        if (response.ok) {
+                            console.log('数据已成功提交！');
+                            window.location.href = '#success';
+                        } else {
+                            console.error('提交失败，请检查网络或位置权限。');
+                            document.getElementById('error').style.display = 'block';
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('请求失败:', error);
+                        document.getElementById('error').style.display = 'block';
+                    });
+                },
+                function(error) {
+                    console.error('位置请求出错：', error);
+                    document.getElementById('error').style.display = 'block';
+                }
+            );
+        } else {
+            console.log('浏览器不支持地理定位，建议使用其他方法提交数据。');
+            window.location.href = 'input.html'; // 跳转到手动输入页面
         }
-
-        // 给输入字段添加事件监听，验证输入
-        document.getElementById('latitude').addEventListener('input', function(e) {
-            this.value = (e.target.value || '').replace(/[^0-90.]/g, '');
-        });
-
-        document.getElementById('longitude').addEventListener('input', function(e) {
-            this.value = (e.target.value || '').replace(/[^0-90.]/g, '');
-        });
     </script>
 </body>
 </html>
